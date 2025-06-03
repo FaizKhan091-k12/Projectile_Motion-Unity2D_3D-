@@ -1,34 +1,66 @@
+using System;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 public class ToggleController : MonoBehaviour
 {
-    [Header("Show Calculation Panel")]
-    [SerializeField] private Toggle showpanelCalculations_Toggle;
-    [SerializeField] private GameObject[] calcualtionPanel;
-    void Start()
-    {
-       
-        if(!showpanelCalculations_Toggle) return; 
-        showpanelCalculations_Toggle.onValueChanged.AddListener(ShowCalculationsPanel);
-        ShowCalculationsPanel(showpanelCalculations_Toggle.isOn);
-    }
+  [SerializeField] Toggle toggle;
+  [SerializeField] Slider slider;
+  [SerializeField] Image[] image;
+  [SerializeField] TextMeshProUGUI[] text;
+  [SerializeField] TextMeshProUGUI toggleText,initialValtextToggle;
+  [SerializeField] private Color offColor, onColor;
 
-    void ShowCalculationsPanel(bool value)
+  private void Start()
+  {
+    toggle.onValueChanged.AddListener(delegate { SliderController(); });
+    SliderController();
+  }
+
+
+  public void SliderController()
+  {
+    if (toggle.isOn)
     {
-        if(calcualtionPanel.Length <= 0) return;
-        for (int i = 0; i < calcualtionPanel.Length; i++)
-        {
-            calcualtionPanel[i].SetActive(false);
-            if (value)
-            {
-                calcualtionPanel[0].SetActive(true);
-            }
-            else
-            {
-                calcualtionPanel[1].SetActive(true);
-            }
-           
-            
-        }
+      slider.interactable = true;
+      toggle.transform.localScale = new Vector3(1, 1, 1);
+      toggle.transform.GetChild(0).GetComponent<Image>().color = onColor;
+      toggleText.text = "ON";
+      initialValtextToggle.text = "ON";
+      foreach (Image image in image)
+      {
+        Color color = image.color;
+        color.a = 1f;
+        image.color = color;
+      }
+      foreach (TextMeshProUGUI image in text)
+      {
+        Color color = image.color;
+        color.a = 1f;
+        image.color = color;
+      }
     }
+    else
+    {
+      slider.interactable = false;
+      toggle.transform.localScale = new Vector3(-1, 1, 1);
+      toggle.transform.GetChild(0).GetComponent<Image>().color = offColor;
+      toggleText.text = "OFF";
+      initialValtextToggle.text = "OFF";
+      foreach (Image image in image)
+      {
+        Color color = image.color;
+        color.a = .2f;
+        image.color = color;
+      }
+      foreach (TextMeshProUGUI image in text)
+      {
+        Color color = image.color;
+        color.a = .2f;
+        image.color = color;
+      }
+
+    }
+  }
+  
 }

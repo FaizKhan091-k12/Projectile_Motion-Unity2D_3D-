@@ -14,6 +14,7 @@ public class ControlPanelButton : MonoBehaviour
     [SerializeField] private Button controlPanel_Button;
     [SerializeField] private float transitionDuration = 0.4f;
     [SerializeField] private bool isPanelOpen;
+    [SerializeField] private float min_Pivot, max_Pivot;
 
     [Header("Fade Targets")]
     [SerializeField] private Image[] imagesToFade;
@@ -33,12 +34,12 @@ public class ControlPanelButton : MonoBehaviour
     public void ClickControlPanelButton()
     {
         // Animate pivot
-        Vector2 targetPivot = isPanelOpen ? new Vector2(0f, controlPanel_RectTransform.pivot.y)
-            : new Vector2(1f, controlPanel_RectTransform.pivot.y);
+        Vector2 targetPivot = isPanelOpen ? new Vector2(min_Pivot, controlPanel_RectTransform.pivot.y)
+            : new Vector2(max_Pivot, controlPanel_RectTransform.pivot.y);
         controlPanel_RectTransform.DOPivot(targetPivot, transitionDuration).SetEase(Ease.InOutSine);
 
         // Fade UI elements
-        float targetAlpha = isPanelOpen ? 1f : 0f;
+        float targetAlpha = isPanelOpen ? .8f : 0f;
         foreach (var img in imagesToFade)
         {
             img.DOFade(targetAlpha, transitionDuration);

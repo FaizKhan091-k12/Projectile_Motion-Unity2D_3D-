@@ -38,15 +38,22 @@ public class SliderController : MonoBehaviour
         {
             howManyNumberAfterPoint = "0.0";
         }
-        slider = GetComponentInChildren<Slider>();
+
+        slider = GetComponent<Slider>();
+            
+       
 
       
         slider.onValueChanged.AddListener(delegate { SliderValueChanged(); });
-        incrementButton.onClick.AddListener(IncrementSlider);
-        decrementButton.onClick.AddListener(DecrementSlider);
+        if (incrementButton != null && decrementButton != null)
+        {
 
-        AddHoldEvents(incrementButton, IncrementSlider);
-        AddHoldEvents(decrementButton, DecrementSlider);
+            incrementButton.onClick.AddListener(IncrementSlider);
+            decrementButton.onClick.AddListener(DecrementSlider);
+
+            AddHoldEvents(incrementButton, IncrementSlider);
+            AddHoldEvents(decrementButton, DecrementSlider);
+        }
 
         SliderValueChanged(); 
     }
@@ -58,8 +65,12 @@ public class SliderController : MonoBehaviour
         string unit = string.IsNullOrWhiteSpace(customSIUnit) ? "" : "" + customSIUnit;
         slider_Value.text = slider.value.ToString(howManyNumberAfterPoint) + unit;
 
-        incrementButton.interactable = slider.value < slider.maxValue;
-        decrementButton.interactable = slider.value > slider.minValue;
+        if (incrementButton != null && decrementButton != null)
+        {
+            incrementButton.interactable = slider.value < slider.maxValue;
+            decrementButton.interactable = slider.value > slider.minValue;
+
+        }
     }
 
     void IncrementSlider()
