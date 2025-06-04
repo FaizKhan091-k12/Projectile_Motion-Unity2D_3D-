@@ -1,0 +1,50 @@
+Projectile Motion – Learning Theory (11th–12th Grade Level)
+
+<b>Definition:</b>
+Projectile motion is the motion of an object thrown or projected into the air, subject only to the acceleration due to gravity. The path followed by a projectile is called its trajectory, and it is typically a curved path (a parabola) under ideal conditions (neglecting air resistance).
+
+<b>Key Characteristics:</b>
+• A projectile has both horizontal and vertical motion components.
+• The horizontal motion is uniform (constant velocity).
+• The vertical motion is uniformly accelerated (due to gravity).
+• The two motions are independent of each other.
+
+<b>Assumptions in Ideal Projectile Motion:</b>
+• Gravity acts downward with constant acceleration (g = 9.8 m/s² on Earth).
+• Air resistance is neglected.
+• The rotation of the Earth is ignored.
+
+<b>Equations of Projectile Motion:</b>
+Let a body be projected with initial speed u at an angle θ with the horizontal axis.
+
+• Horizontal component of velocity = u·cos(θ)
+• Vertical component of velocity = u·sin(θ)
+
+Time of flight (T): T = (2·u·sinθ)/g  
+Maximum height (H): H = (u²·sin²θ)/(2·g)  
+Horizontal range (R): R = (u²·sin(2θ))/g
+
+<b>Types of Projectile Motion:</b>
+1. Horizontal Projectile – Object is projected horizontally from a height (e.g., a ball rolling off a table).
+2. Oblique Projectile – Object is projected at an angle with the horizontal.
+
+<b>Effect of Variables:</b>
+• Speed: More speed means longer range and higher height.
+• Angle: 45° gives maximum range (in ideal conditions).
+• Height: Higher launch point gives more time in air.
+• Gravity: Lower gravity (like on the Moon) increases range and flight time.
+• Air Resistance: Reduces range and makes the motion non-symmetric.
+
+<b>Practical Applications:</b>
+• Sports (throwing, jumping, archery)
+• Engineering (trajectory prediction for structures and machines)
+• Ballistics (gunfire, missiles)
+• Space science (launching spacecraft)
+
+<b>Learning Outcomes:</b>
+By studying this simulation, students will be able to:
+• Understand the kinematics of two-dimensional motion.
+• Break motion into horizontal and vertical components.
+• Apply equations of motion to real-life projectile problems.
+• Predict the effect of variables like angle, speed, and height.
+• Appreciate the relevance of physics in everyday life and technology.
