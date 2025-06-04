@@ -39,6 +39,14 @@ public class AdvancedOrbitCamera : MonoBehaviour
     [Header("Smoothing")]
     [SerializeField] private float smoothTime = 0.15f;
 
+    [Header("Target Height Mapping")]
+    [SerializeField] private float minTargetY = 0f;
+    [SerializeField] private float maxTargetY = 5f;
+    [SerializeField] private bool useTargetYPosition = false;
+    [SerializeField] private float minTargetX = 0f;
+    [SerializeField] private float maxTargetX = 5f;
+    [SerializeField] private bool useTargetXPosition = false;
+
     public bool canOrbit = true;
 
     private float targetX, targetY, currentX, currentY;
@@ -95,22 +103,21 @@ public class AdvancedOrbitCamera : MonoBehaviour
         HandleInput();
         ApplySmoothCamera();
 
-#if UNITY_EDITOR
-        // Update default values live during Play mode
+    #if UNITY_EDITOR
         if (Application.isPlaying)
         {
             defaultHorizontalRotation = currentX;
             defaultVerticalRotation = currentY;
             defaultZoom = currentDistance;
         }
-#endif
+    #endif
     }
 
     private void HandleInput()
     {
         bool isPointerOverUI = EventSystem.current != null && EventSystem.current.IsPointerOverGameObject();
 
-#if UNITY_EDITOR || UNITY_STANDALONE || UNITY_WEBGL
+    #if UNITY_EDITOR || UNITY_STANDALONE || UNITY_WEBGL
         bool isRotating = !requireRightClick || Input.GetMouseButton(1);
 
         if (!isPointerOverUI && isRotating && Input.GetMouseButton(0))
@@ -125,9 +132,9 @@ public class AdvancedOrbitCamera : MonoBehaviour
         {
             targetDistance -= scroll * zoomSpeed;
         }
-#endif
+    #endif
 
-#if UNITY_ANDROID || UNITY_IOS || UNITY_SIMULATOR
+    #if UNITY_ANDROID || UNITY_IOS || UNITY_SIMULATOR
         if (Input.touchCount == 1 && Input.GetTouch(0).phase == TouchPhase.Moved)
         {
             Vector2 delta = Input.GetTouch(0).deltaPosition;
@@ -147,7 +154,7 @@ public class AdvancedOrbitCamera : MonoBehaviour
 
             targetDistance += deltaMag * zoomSpeed * 0.005f;
         }
-#endif
+    #endif
 
         targetDistance = Mathf.Clamp(targetDistance, minZoom, maxZoom);
 
@@ -167,8 +174,14 @@ public class AdvancedOrbitCamera : MonoBehaviour
         Quaternion rotation = Quaternion.Euler(currentY, currentX, 0);
         Vector3 direction = rotation * Vector3.forward;
 
-        orbitCamera.transform.position = target.position + cameraTargetOffset - direction * currentDistance;
-        orbitCamera.transform.LookAt(target.position + cameraTargetOffset);
+        float mappedY = useTargetYPosition ? Mathf.Lerp(minTargetY, maxTargetY, Mathf.InverseLerp(minZoom, maxZoom, currentDistance)) : target.position.y;
+        float mappedX = useTargetXPosition ? Mathf.Lerp(minTargetX, maxTargetX, Mathf.InverseLerp(minZoom, maxZoom, currentDistance)) : target.position.x;
+
+        Vector3 updatedTargetPos = new Vector3(mappedX, mappedY, target.position.z);
+        target.position = updatedTargetPos;
+
+        orbitCamera.transform.position = updatedTargetPos + cameraTargetOffset - direction * currentDistance;
+        orbitCamera.transform.LookAt(updatedTargetPos + cameraTargetOffset);
     }
 
 #if UNITY_EDITOR

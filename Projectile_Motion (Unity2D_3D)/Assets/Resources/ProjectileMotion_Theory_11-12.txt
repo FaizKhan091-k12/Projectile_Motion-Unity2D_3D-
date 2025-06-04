@@ -1,4 +1,4 @@
-Projectile Motion – Learning Theory (11th–12th Grade Level)
+                                    <b>Projectile Motion:</b>
 
 <b>Definition:</b>
 Projectile motion is the motion of an object thrown or projected into the air, subject only to the acceleration due to gravity. The path followed by a projectile is called its trajectory, and it is typically a curved path (a parabola) under ideal conditions (neglecting air resistance).
