@@ -160,7 +160,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      canon_LOW_TD_Checker_Roughness_0: -4149829475683972323
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

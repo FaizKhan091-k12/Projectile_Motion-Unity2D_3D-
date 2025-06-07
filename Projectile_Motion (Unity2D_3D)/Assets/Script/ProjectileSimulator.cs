@@ -5,17 +5,15 @@ using System.Collections.Generic;
 
 public class ProjectileSimulator : MonoBehaviour
 {
-    [Header("Target Position")]
-    [SerializeField] bool isFollowingTarget = false;
-    [SerializeField] Transform target;
+    [Header("Target & Launch Settings")]
+    [SerializeField] private Transform launchPoint;
+    [SerializeField] private bool isFollowingTarget = false;
+    [SerializeField] private Transform target;
 
     [Header("References")]
+    public GameObject projectilePrefab; // Drag sphere prefab here
     [SerializeField] private Material lineMaterial;
-    public Transform projectile;
-    public GLTrajectoryRenderer glRenderer;
     public GameObject canonFace;
-
-    private List<Vector3> trajectoryPoints = new List<Vector3>();
 
     [Header("Settings")]
     public bool useAirResistance = true;
@@ -33,38 +31,35 @@ public class ProjectileSimulator : MonoBehaviour
     public float dragCoefficient = 0.47f;
 
     [Header("UI References")]
-    [SerializeField] Slider initialSpeedslider;
-    [SerializeField] Slider launchAngleSlider;
-    [SerializeField] Slider gravitySlider;
-    [SerializeField] Slider massSlider;
-    [SerializeField] Slider altitudeSlider;
-    [SerializeField] Slider diameterSlider;
-    [SerializeField] Slider heightSlider;
-    [SerializeField] Toggle useAirResistanceToggle;
+    [SerializeField] private Slider initialSpeedslider;
+    [SerializeField] private Slider launchAngleSlider;
+    [SerializeField] private Slider gravitySlider;
+    [SerializeField] private Slider massSlider;
+    [SerializeField] private Slider altitudeSlider;
+    [SerializeField] private Slider diameterSlider;
+    [SerializeField] private Slider heightSlider;
+    [SerializeField] private Toggle useAirResistanceToggle;
 
-    private Vector3 velocity;
-    private Vector3 startPos;
-    private float startX;
     private float timeElapsed = 0f;
-    private bool isSimulating = false;
+    private List<GameObject> activeProjectiles = new List<GameObject>();
+    public int maxProjectiles = 5;
 
     void Start()
     {
         InitializeValues();
-        startPos = projectile.position;
 
-        initialSpeedslider.onValueChanged.AddListener(delegate { initialSpeed = initialSpeedslider.value; });
-        launchAngleSlider.onValueChanged.AddListener(delegate
+        initialSpeedslider.onValueChanged.AddListener(_ => initialSpeed = initialSpeedslider.value);
+        launchAngleSlider.onValueChanged.AddListener(_ =>
         {
             launchAngle = launchAngleSlider.value;
             canonFace.transform.localRotation = Quaternion.Euler(launchAngle, 0, 0);
         });
-        gravitySlider.onValueChanged.AddListener(delegate { gravity = gravitySlider.value; });
-        massSlider.onValueChanged.AddListener(delegate { mass = massSlider.value; });
-        altitudeSlider.onValueChanged.AddListener(delegate { altitude = altitudeSlider.value; });
-        diameterSlider.onValueChanged.AddListener(delegate { diameter = diameterSlider.value; });
-        heightSlider.onValueChanged.AddListener(delegate { height = heightSlider.value; });
-        useAirResistanceToggle.onValueChanged.AddListener(delegate { useAirResistance = useAirResistanceToggle.isOn; });
+        gravitySlider.onValueChanged.AddListener(_ => gravity = gravitySlider.value);
+        massSlider.onValueChanged.AddListener(_ => mass = massSlider.value);
+        altitudeSlider.onValueChanged.AddListener(_ => altitude = altitudeSlider.value);
+        diameterSlider.onValueChanged.AddListener(_ => diameter = diameterSlider.value);
+        heightSlider.onValueChanged.AddListener(_ => height = heightSlider.value);
+        useAirResistanceToggle.onValueChanged.AddListener(_ => useAirResistance = useAirResistanceToggle.isOn);
     }
 
     public void InitializeValues()
@@ -82,100 +77,87 @@ public class ProjectileSimulator : MonoBehaviour
 
     public void Launch()
     {
-        StopAllCoroutines();
-        timeElapsed = 0f;
-        isSimulating = false;
-        trajectoryPoints.Clear();
+        if (activeProjectiles.Count >= maxProjectiles)
+        {
+            Destroy(activeProjectiles[0]);
+            activeProjectiles.RemoveAt(0);
+        }
 
-        Vector3 launchPos = startPos;
-        launchPos.y += height;
-        startX = launchPos.x;
+        List<Vector3> trajectoryPoints = CalculateTrajectory(out float totalTime);
+        Vector3 launchPos = launchPoint.position + new Vector3(0, height, 0);
 
+        GameObject projectileInstance = Instantiate(projectilePrefab, launchPos, Quaternion.identity);
+        activeProjectiles.Add(projectileInstance);
+
+        // 💬 Debug time and distance
+        float distanceTraveled = trajectoryPoints[^1].x - launchPos.x;
+        Debug.Log($"🕒 Time of Flight: {totalTime:F3} seconds" + $"📏 Distance Traveled: {distanceTraveled:F3} meters");
+        //Debug.Log($"📏 Distance Traveled: {distanceTraveled:F3} meters");
+
+        // 💡 Make the target follow this projectile if enabled
+        if (isFollowingTarget && target != null)
+        {
+            target.SetParent(projectileInstance.transform);
+            target.localPosition = Vector3.zero;
+        }
+
+        Transform glLine = projectileInstance.transform.Find("GLLine");
+
+        if (glLine == null)
+        {
+            Debug.LogError("GLLine child object not found on the projectile prefab.");
+            return;
+        }
+
+        ProjectileLogic logic = projectileInstance.GetComponent<ProjectileLogic>();
+        if (logic != null)
+        {
+            logic.Initialize(trajectoryPoints, totalTime, lineMaterial, glLine.gameObject);
+        }
+        else
+        {
+            Debug.LogError("ProjectileLogic component not found on projectile prefab.");
+        }
+    }
+
+
+
+    private List<Vector3> CalculateTrajectory(out float timeElapsed)
+    {
+        List<Vector3> points = new List<Vector3>();
         float angleRad = launchAngle * Mathf.Deg2Rad;
-        Vector3 simVelocity = new Vector3(
+
+        Vector3 velocity = new Vector3(
             initialSpeed * Mathf.Cos(angleRad),
             initialSpeed * Mathf.Sin(angleRad),
             0f
         );
 
-        Vector3 position = launchPos;
+        Vector3 position = launchPoint.position + new Vector3(0, height, 0);
         float simStep = 0.005f;
-        float localTime = 0f;
+        float time = 0f;
 
-        while (position.y >= startPos.y)
+        while (position.y >= launchPoint.position.y)
         {
-            trajectoryPoints.Add(position);
+            points.Add(position);
 
-            Vector3 acceleration = new Vector3(0f, -gravity, 0f);
+            Vector3 acceleration = new Vector3(0, -gravity, 0);
             if (useAirResistance)
             {
                 float airDensity = 1.225f * Mathf.Pow((1 - 0.0000225577f * altitude), 5.25588f);
                 float radius = diameter / 2f;
                 float area = Mathf.PI * radius * radius;
-                float speed = simVelocity.magnitude;
-                Vector3 dragForce = 0.5f * airDensity * speed * speed * dragCoefficient * area * -simVelocity.normalized;
+                float speed = velocity.magnitude;
+                Vector3 dragForce = 0.5f * airDensity * speed * speed * dragCoefficient * area * -velocity.normalized;
                 acceleration += dragForce / mass;
             }
 
-            simVelocity += acceleration * simStep;
-            position += simVelocity * simStep;
-            localTime += simStep;
+            velocity += acceleration * simStep;
+            position += velocity * simStep;
+            time += simStep;
         }
 
-        timeElapsed = localTime;
-        Debug.Log($"🎯 Distance Traveled: {position.x - startX:F3} m");
-        Debug.Log($"🕒 Time of Flight: {timeElapsed:F3} s");
-
-        if (glRenderer != null)
-        {
-            glRenderer.Initialize(lineMaterial, trajectoryPoints);
-            glRenderer.UpdateDrawCount(0);
-
-        }
-
-        StartCoroutine(AnimateProjectilePath());
-    }
-
-    private IEnumerator AnimateProjectilePath()
-    {
-        isSimulating = true;
-
-        float elapsed = 0f;
-        int index = 0;
-
-        projectile.position = trajectoryPoints[0];
-
-        while (index < trajectoryPoints.Count - 1)
-        {
-            elapsed += Time.deltaTime;
-            float t = elapsed / timeElapsed;
-            t = Mathf.Clamp01(t);
-
-            int newIndex = Mathf.FloorToInt(t * (trajectoryPoints.Count - 1));
-            index = newIndex;
-
-            float tIndex = t * (trajectoryPoints.Count - 1);
-            int i0 = Mathf.FloorToInt(tIndex);
-            int i1 = Mathf.Min(i0 + 1, trajectoryPoints.Count - 1);
-            float lerpT = tIndex - i0;
-
-            projectile.position = Vector3.Lerp(trajectoryPoints[i0], trajectoryPoints[i1], lerpT);
-
-            if (glRenderer != null)
-                glRenderer.UpdateDrawCount(index + 1);
-
-
-            if (isFollowingTarget && target != null)
-                target.position = projectile.position;
-
-            yield return null;
-        }
-
-        projectile.position = trajectoryPoints[^1];
-        if (glRenderer != null)
-            glRenderer.UpdateDrawCount(trajectoryPoints.Count);
-
-
-        isSimulating = false;
+        timeElapsed = time;
+        return points;
     }
 }

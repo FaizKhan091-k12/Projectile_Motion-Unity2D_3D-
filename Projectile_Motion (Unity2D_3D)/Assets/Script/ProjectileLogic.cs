@@ -1,31 +1,33 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-[RequireComponent(typeof(MeshRenderer))]
 public class ProjectileLogic : MonoBehaviour
 {
-    public float timeToTravel = 2f;
-    public Material lineMaterial;
-
+    private List<Vector3> trajectoryPoints;
+    private float timeToTravel;
     private float elapsed = 0f;
     private int currentIndex = 0;
+
     private GLTrajectoryRenderer glDrawer;
     private bool isAnimating = false;
-    private List<Vector3> trajectoryPoints;
 
-    public void Initialize(List<Vector3> points)
+    public void Initialize(List<Vector3> points, float totalTime, Material lineMat, GameObject glDrawerObj)
     {
         if (points == null || points.Count < 2)
         {
-            Debug.LogError("ProjectileLogic: Trajectory not set or too short.");
+            Debug.LogError("Invalid trajectory points");
             return;
         }
 
-        trajectoryPoints = points;
+        trajectoryPoints = new List<Vector3>(points);
+        timeToTravel = totalTime;
+        glDrawer = glDrawerObj.GetComponent<GLTrajectoryRenderer>();
 
-        glDrawer = gameObject.AddComponent<GLTrajectoryRenderer>();
-        glDrawer.Initialize(lineMaterial, trajectoryPoints);
-        glDrawer.enabled = true;
+        if (glDrawer != null)
+        {
+            glDrawer.Initialize(lineMat, trajectoryPoints);
+            glDrawer.UpdateDrawCount(0);
+        }
 
         transform.position = trajectoryPoints[0];
         isAnimating = true;
@@ -33,7 +35,8 @@ public class ProjectileLogic : MonoBehaviour
 
     void Update()
     {
-        if (!isAnimating || trajectoryPoints.Count < 2) return;
+        if (!isAnimating || trajectoryPoints == null || trajectoryPoints.Count < 2)
+            return;
 
         elapsed += Time.deltaTime;
         float t = Mathf.Clamp01(elapsed / timeToTravel);
@@ -44,13 +47,14 @@ public class ProjectileLogic : MonoBehaviour
         float lerpT = tIndex - i0;
 
         transform.position = Vector3.Lerp(trajectoryPoints[i0], trajectoryPoints[i1], lerpT);
-        glDrawer.UpdateDrawCount(Mathf.FloorToInt(t * trajectoryPoints.Count));
+
+        glDrawer?.UpdateDrawCount(i0 + 1);
 
         if (t >= 1f)
         {
-            isAnimating = false;
             transform.position = trajectoryPoints[^1];
-            glDrawer.UpdateDrawCount(trajectoryPoints.Count);
+            glDrawer?.UpdateDrawCount(trajectoryPoints.Count);
+            isAnimating = false;
         }
     }
 }

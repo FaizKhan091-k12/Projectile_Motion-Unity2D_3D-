@@ -35,9 +35,9 @@ RenderSettings:
   m_DefaultReflectionMode: 0
   m_DefaultReflectionResolution: 128
   m_ReflectionBounces: 1
-  m_ReflectionIntensity: 1
+  m_ReflectionIntensity: 0.533
   m_CustomReflection: {fileID: 0}
-  m_Sun: {fileID: 446414106}
+  m_Sun: {fileID: 0}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -94,7 +94,7 @@ LightmapSettings:
     m_TrainingDataDestination: TrainingData
     m_LightProbeSampleCountMultiplier: 4
   m_LightingDataAsset: {fileID: 0}
-  m_LightingSettings: {fileID: 0}
+  m_LightingSettings: {fileID: 4890085278179872738, guid: b0c5540ded6230e4396e5604c139d9b9, type: 2}
 --- !u!196 &4
 NavMeshSettings:
   serializedVersion: 2
@@ -5479,7 +5479,6 @@ GameObject:
   - component: {fileID: 519420031}
   - component: {fileID: 519420029}
   - component: {fileID: 519420030}
-  - component: {fileID: 519420033}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -5605,19 +5604,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 454293809}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &519420033
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 519420028}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: febae9aba0037264086dd2e14e456eac, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  lineColor: {r: 0, g: 1, b: 1, a: 1}
 --- !u!1 &535577239
 GameObject:
   m_ObjectHideFlags: 0
@@ -7526,11 +7512,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 325afe91fad105c40b302cf443591827, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isFollowingTarget: 0
+  launchPoint: {fileID: 1238456134}
+  isFollowingTarget: 1
   target: {fileID: 1538605327}
+  projectilePrefab: {fileID: 1665506411974461409, guid: 31ab12a4dceeddd429d09b02aa458763, type: 3}
   lineMaterial: {fileID: 2100000, guid: ce9a063cdc1cf9943b13a189718a9896, type: 2}
-  projectile: {fileID: 5778599072572302310, guid: 60fa5f91d83c78a4182fa5105cfd4e47, type: 3}
-  glRenderer: {fileID: 519420033}
   canonFace: {fileID: 568172877}
   useAirResistance: 0
   initialSpeed: 18
@@ -7549,6 +7535,7 @@ MonoBehaviour:
   diameterSlider: {fileID: 1832267922}
   heightSlider: {fileID: 1728791594}
   useAirResistanceToggle: {fileID: 862924119}
+  maxProjectiles: 5
 --- !u!1 &791887998
 GameObject:
   m_ObjectHideFlags: 0
@@ -13747,18 +13734,6 @@ MonoBehaviour:
       - m_Target: {fileID: 778660095}
         m_TargetAssemblyTypeName: ProjectileSimulator, Assembly-CSharp
         m_MethodName: Launch
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 778660095}
-        m_TargetAssemblyTypeName: ProjectileSimulator, Assembly-CSharp
-        m_MethodName: InitializeValues
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -36118,7 +36093,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 5866983511357007268}
   m_HandleRect: {fileID: 8760008387291496670}
   m_Direction: 2
-  m_Value: 1
+  m_Value: 0
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:

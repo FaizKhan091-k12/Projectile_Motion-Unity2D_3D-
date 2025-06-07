@@ -160,7 +160,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      canon_LOW_TD_Checker_Height_0: 7942014989452460880
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
