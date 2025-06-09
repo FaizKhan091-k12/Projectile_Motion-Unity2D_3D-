@@ -9,43 +9,43 @@ public class AdvancedOrbitCamera : MonoBehaviour
     [SerializeField] private Camera orbitCamera;
 
     [Header("Initial View")]
-    [SerializeField] private float defaultZoom = 10f;
-    [SerializeField] private float defaultHorizontalRotation = 0f;
-    [SerializeField] private float defaultVerticalRotation = 20f;
+    [SerializeField] public float defaultZoom = 10f;
+    [SerializeField] public float defaultHorizontalRotation = 0f;
+    [SerializeField] public float defaultVerticalRotation = 20f;
 
     [Header("Target Settings")]
-    [SerializeField] private Transform target;
+    [SerializeField] public Transform target;
     [SerializeField] private Vector3 cameraTargetOffset = Vector3.zero;
 
     [Header("Rotation Settings")]
     [SerializeField] private float rotationSpeed = 5f;
     [SerializeField] private bool invertY = false;
 
-    [SerializeField] private bool restrictVerticalRotation = true;
-    [SerializeField] private float minVerticalAngle = -20f;
-    [SerializeField] private float maxVerticalAngle = 80f;
+    [SerializeField] public bool restrictVerticalRotation = true;
+    [SerializeField] public float minVerticalAngle = -20f;
+    [SerializeField] public float maxVerticalAngle = 80f;
 
-    [SerializeField] private bool restrictHorizontalRotation = false;
-    [SerializeField] private float minHorizontalAngle = -360f;
-    [SerializeField] private float maxHorizontalAngle = 360f;
+    [SerializeField] public bool restrictHorizontalRotation = false;
+    [SerializeField] public float minHorizontalAngle = -360f;
+    [SerializeField] public float maxHorizontalAngle = 360f;
 
     [SerializeField] private bool requireRightClick = false;
 
     [Header("Zoom Settings")]
     [SerializeField] private float zoomSpeed = 5f;
-    [SerializeField] private float minZoom = 3f;
-    [SerializeField] private float maxZoom = 20f;
+    [SerializeField] public float minZoom = 3f;
+    [SerializeField] public float maxZoom = 20f;
 
     [Header("Smoothing")]
     [SerializeField] private float smoothTime = 0.15f;
 
     [Header("Target Height Mapping")]
-    [SerializeField] private float minTargetY = 0f;
-    [SerializeField] private float maxTargetY = 5f;
-    [SerializeField] private bool useTargetYPosition = false;
-    [SerializeField] private float minTargetX = 0f;
-    [SerializeField] private float maxTargetX = 5f;
-    [SerializeField] private bool useTargetXPosition = false;
+    [SerializeField] public float minTargetY = 0f;
+    [SerializeField] public float maxTargetY = 5f;
+    [SerializeField] public bool useTargetYPosition = false;
+    [SerializeField] public float minTargetX = 0f;
+    [SerializeField] public float maxTargetX = 5f;
+    [SerializeField] public bool useTargetXPosition = false;
 
     public bool canOrbit = true;
 
@@ -53,6 +53,20 @@ public class AdvancedOrbitCamera : MonoBehaviour
     private float rotationVelocityX, rotationVelocityY;
     private float targetDistance, currentDistance, zoomVelocity;
 
+    [Header("Reset Default On Events")]
+    public bool resetValues;
+    public float setdefaultZoom, setdefaultHorizontalRotation, setdefaultVerticalRotation;
+    
+    [Header("Recoil Shake")]
+    public bool enableRecoilShake = false;
+    public float shakeDuration = 0.5f;
+    public float shakeMagnitude = 0.2f;
+
+    private float shakeTimer = 0f;
+    private Vector3 recoilOffset = Vector3.zero;
+
+
+  
     private void Awake()
     {
         instance = this;
@@ -68,6 +82,26 @@ public class AdvancedOrbitCamera : MonoBehaviour
             target = new GameObject("CameraTarget").transform;
         }
 
+        ApplyInitialView();
+    }
+    
+    public void StartRecoilShake()
+    {
+        enableRecoilShake = true;
+        shakeTimer = shakeDuration;
+    }
+
+
+    public void ResetValues()
+    {
+        if (!resetValues) return;
+        SetDefaults();
+    }
+    public void SetDefaults()
+    {
+        this.defaultZoom = setdefaultZoom;
+        this.defaultHorizontalRotation = setdefaultHorizontalRotation;
+        this.defaultVerticalRotation = setdefaultVerticalRotation;
         ApplyInitialView();
     }
 
@@ -102,6 +136,27 @@ public class AdvancedOrbitCamera : MonoBehaviour
 
         HandleInput();
         ApplySmoothCamera();
+        if (enableRecoilShake)
+        {
+            shakeTimer -= Time.deltaTime;
+
+            // Backward recoil on Z (camera local space) + small vibration on X/Y
+            float recoilZ = Mathf.Lerp(shakeMagnitude, 0f, 1 - (shakeTimer / shakeDuration));
+            Vector2 jitter = Random.insideUnitCircle * (shakeMagnitude * 0.2f);
+            recoilOffset = orbitCamera.transform.TransformDirection(new Vector3(jitter.x, jitter.y, -recoilZ));
+
+            if (shakeTimer <= 0f)
+            {
+                enableRecoilShake = false;
+                recoilOffset = Vector3.zero;
+            }
+        }
+        else
+        {
+            recoilOffset = Vector3.zero;
+        }
+
+
 
     #if UNITY_EDITOR
         if (Application.isPlaying)
@@ -180,7 +235,8 @@ public class AdvancedOrbitCamera : MonoBehaviour
         Vector3 updatedTargetPos = new Vector3(mappedX, mappedY, target.position.z);
         target.position = updatedTargetPos;
 
-        orbitCamera.transform.position = updatedTargetPos + cameraTargetOffset - direction * currentDistance;
+        orbitCamera.transform.position = updatedTargetPos + cameraTargetOffset - direction * currentDistance + recoilOffset;
+
         orbitCamera.transform.LookAt(updatedTargetPos + cameraTargetOffset);
     }
 

@@ -66,7 +66,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
+  - {fileID: 2100000, guid: 0c895878158538245b4ed97bf76181ab, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -100,8 +100,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f8c69c1ebf3112b4d96e9fc3ad7e61bf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  trajectoryPoints: []
-  timeToTravel: 2
 --- !u!1 &5352792577882962648
 GameObject:
   m_ObjectHideFlags: 0

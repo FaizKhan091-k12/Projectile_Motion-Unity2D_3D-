@@ -160,7 +160,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      brown_mud_leaves_01_diff_4k_0: 5386193567792651991
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

@@ -8,7 +8,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: GLLine
-  m_Shader: {fileID: 4800000, guid: 2ce02f09c632d5043a2e75552c2306e9, type: 3}
+  m_Shader: {fileID: 4800000, guid: 7546a2330a22f7e48a6fa2f07717877c, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []

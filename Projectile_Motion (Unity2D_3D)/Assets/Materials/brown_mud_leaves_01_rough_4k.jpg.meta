@@ -160,7 +160,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      brown_mud_leaves_01_rough_4k_0: -3661154102467815925
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
