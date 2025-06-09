@@ -244,4 +244,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: febae9aba0037264086dd2e14e456eac, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  lineMaterial: {fileID: 2100000, guid: 18dadc49b202980488ac2c17e1cda089, type: 2}
+  lineMaterial: {fileID: 2100000, guid: cedc1f6f4a67a0049b9772dc9b2d95dd, type: 2}
